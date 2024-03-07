@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -31,6 +32,8 @@ public class NetworkServer : IDisposable
         //Debug.Log(userData.userName);
 
         response.Approved = true;
+        response.Position = SpawnPoint.GetRandomSpawnPos();
+        response.Rotation = quaternion.identity;
         response.CreatePlayerObject = true;
     }
 
@@ -48,6 +51,20 @@ public class NetworkServer : IDisposable
        }
     }
 
+    public UserData GetUserDataByClientId(ulong clientId)
+    {
+        if (clientIdToAuth.TryGetValue(clientId,out  string authId))
+        {
+            if (authIdToUserData.TryGetValue(authId,out UserData data))
+            {
+                return data;
+            }
+
+            return null;
+        }
+
+        return null;
+    }
     public void Dispose()
     {
         if(networkManager == null) { return; }
@@ -61,4 +78,6 @@ public class NetworkServer : IDisposable
             networkManager.Shutdown();
         }
     }
+
+    
 }
