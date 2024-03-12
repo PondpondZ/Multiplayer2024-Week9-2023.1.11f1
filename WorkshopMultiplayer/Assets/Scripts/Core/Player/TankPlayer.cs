@@ -37,12 +37,17 @@ public class TankPlayer : NetworkBehaviour
          virtualCamera.Priority = ownerPriority;
       }
    }
-
+   
    public override void OnNetworkDespawn()
    {
       if (IsServer)
       {
          OnPlayerDespawned.Invoke(this);
       }
+   }
+
+   private void HandlePlayerSpawned(TankPlayer player)
+   {
+     // player.Health.OnDie += (health == HandlePlayerDie(player));
    }
 }

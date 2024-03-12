@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -36,12 +37,27 @@ public class RespawnHandler : NetworkBehaviour
 
     private void HandlerPlayerSpawned(TankPlayer player)
     {
-        
+        player.Health.OnDie += (health) => HandlePlayerDie(player);
     }
 
     private void HandlePlayerDespawned(TankPlayer player)
     {
+        player.Health.OnDie -= (health) => HandlePlayerDie(player);
+    }
+
+    private void HandlePlayerDie(TankPlayer player)
+    {
+        Destroy(player.gameObject);
+        StartCoroutine(RespawnPlayer(player.OwnerClientId));
+    }
+
+    private IEnumerator RespawnPlayer(ulong ownerClientId)
+    {
+        yield return null;
+        NetworkObject playerInstance = Instantiate(
+            playerPrefab, SpawnPoint.GetRandomSpawnPos(), Quaternion.identity);
         
+        playerInstance.SpawnAsPlayerObject(ownerClientId);
     }
 
 }
